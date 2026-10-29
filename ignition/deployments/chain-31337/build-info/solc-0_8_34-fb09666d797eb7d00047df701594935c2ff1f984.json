@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_34-fb09666d797eb7d00047df701594935c2ff1f984",
+  "solcVersion": "0.8.34",
+  "solcLongVersion": "0.8.34+commit.80d5c536",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.21.1"
+  },
+  "userSourceNameMap": {
+    "contracts/OnChainWordle.sol": "project/contracts/OnChainWordle.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "osaka",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/OnChainWordle.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.34;\n\ncontract OnChainWordle {\n    \n    address public owner;\n    bytes5 public secretWord;\n    uint256 public constant MAX_ATTEMPT = 6;\n    uint256 public wordLength = 5;\n\n    uint256 public currentRound;\n\n    mapping( address => mapping ( uint256 => uint256 ) ) public attempts;\n    mapping( address => mapping ( uint256 => bool ) ) public hasWon;\n\n    enum LetterStatus{\n        Gray, Yellow, Green\n    }\n\n    event GuessSubmitted(\n        address indexed player,\n        uint256 indexed round,\n        string guess, // or else bytes5\n        uint8[5] result,\n        bool isCorrect,\n        uint256 attemptsUsed\n    );\n\n    event SecretWordUpdate(bytes5 newSecretWord, uint256 round );\n\n    modifier onlyOwner {\n        require( msg.sender == owner, \"Only owner are allowed\");\n        _;\n    }\n\n    constructor(string memory _initialsecretWord){\n        require( bytes(_initialsecretWord).length == 5, \"Word must be of size 5\" );\n        owner = msg.sender;\n        currentRound = 1;\n        secretWord = bytes5(bytes(_initialsecretWord));\n    }\n\n    function setSecretWord(string memory _newSecretWord)  external onlyOwner {  \n        require( bytes( _newSecretWord ).length == 5, \"Word must be of size 5\" );\n        secretWord = bytes5( bytes( _newSecretWord ) );\n        currentRound += 1;\n        emit SecretWordUpdate(secretWord, currentRound);\n    }\n\n    function submitGuess(string memory _guess) external returns (uint8[5] memory result) {\n        bytes memory guessBytes = bytes(_guess);\n\n        require(attempts[msg.sender][ currentRound ] < MAX_ATTEMPT, \"Player has already used all of his 6 attempt\" );\n        require(hasWon[msg.sender][currentRound] == false , \"Player has already won the Current Round\");\n        require(guessBytes.length == 5, \"Length of the guessed word must be 5\");\n\n        bytes memory secretBytes = abi.encodePacked(secretWord);\n        bool[5] memory secretMatched;\n        bool[5] memory guessMatched;\n        bool allCorrect = true;\n\n        for( uint256 i = 0; i < 5; i++){\n            if(guessBytes[i] == secretBytes[i]){\n                result[i] = uint8(LetterStatus.Green);\n                secretMatched[i] = true;\n                guessMatched[i] = true;\n            }\n            else{\n                allCorrect = false;\n            }\n        }\n\n        for(uint256 i = 0; i < 5; i++){\n            if( !guessMatched[i] ){\n                for( uint256 j = 0; j < 5; j++){\n                    if(!secretMatched[j] && secretBytes[j] == guessBytes[i] ){\n                        secretMatched[j] = true;\n                        result[i] = uint8(LetterStatus.Yellow);\n                        break;\n                    }\n                }    \n            }\n        }\n\n        attempts[msg.sender][currentRound] += 1;\n        \n        if(allCorrect){\n            hasWon[msg.sender][currentRound] = true;\n        }\n\n        emit GuessSubmitted(\n            msg.sender,\n            currentRound,\n            _guess,\n            result,\n            allCorrect,\n            attempts[msg.sender][currentRound]\n        );\n\n        return result;\n    }\n}"
+      }
+    }
+  }
+}

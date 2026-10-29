@@ -1,0 +1,107 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_initialsecretWord",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "player",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "round",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "guess",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8[5]",
+        "name": "result",
+        "type": "uint8[5]"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isCorrect",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "attemptsUsed",
+        "type": "uint256"
+      }
+    ],
+    "name": "GuessSubmitted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes5",
+        "name": "newSecretWord",
+        "type": "bytes5"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "round",
+        "type": "uint256"
+      }
+    ],
+    "name": "SecretWordUpdate",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "currentRound",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_guess",
+        "type": "string"
+      }
+    ],
+    "name": "submitGuess",
+    "outputs": [
+      {
+        "internalType": "uint8[5]",
+        "name": "result",
+        "type": "uint8[5]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
